@@ -1,6 +1,6 @@
 let isLoginMode = true;
 // API base - change if your backend runs elsewhere
-    const API_BASE = "http://127.0.0.1:5000";
+    const API_BASE = "";
 
     // Feature flags (local UI only)
     const featureFlags = {
