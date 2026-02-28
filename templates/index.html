@@ -4,576 +4,127 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <title>Pro Creator Hub - Thumbnail Board</title>
-    <style>
-        /* (same CSS as your original file) */
-        * { margin:0; padding:0; box-sizing:border-box; }
-        :root{
-            --bg-primary:#0f0f0f; --bg-secondary:#1a1a1a; --bg-tertiary:#272727;
-            --text-primary:#ffffff; --text-secondary:#aaaaaa; --border-color:#303030;
-            --button-red:#ff0000; --button-red-hover:#cc0000; --accent-color:#0080ff;
-            --success-color:#00c853; --warning-color:#ffa726; --sidebar-width:280px;
-        }
-        body{
-            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
-            background-color:var(--bg-primary); color:var(--text-primary); line-height:1.6;
-        }
-        .app-container{display:flex;height:100vh;}
-        .sidebar{width:var(--sidebar-width);background-color:var(--bg-secondary);border-right:1px solid var(--border-color);display:flex;flex-direction:column;overflow:hidden;}
-        .sidebar-header{padding:1.5rem;border-bottom:1px solid var(--border-color);}
-        .sidebar-header h2{font-size:1.25rem;font-weight:bold;margin-bottom:0.5rem;}
-        .sidebar-subtitle{font-size:0.75rem;color:var(--text-secondary);}
-        .sidebar-content{flex:1;overflow-y:auto;padding:1rem;}
-        .add-board-btn{width:100%;padding:0.75rem;background-color:var(--button-red);color:white;border:none;border-radius:0.5rem;font-size:0.875rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.5rem;margin-bottom:1rem;}
-        .add-board-btn:hover{background-color:var(--button-red-hover);transform:translateY(-2px);}
-        .board-list{display:flex;flex-direction:column;gap:0.5rem;}
-        .board-item{padding:0.875rem;background-color:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:0.5rem;cursor:pointer;transition:all 0.2s;display:flex;justify-content:space-between;align-items:center;}
-        .board-item:hover{border-color:var(--accent-color);background-color:rgba(0,128,255,0.1);}
-        .board-item.active{background-color:var(--accent-color);border-color:var(--accent-color);}
-        .board-info{flex:1;}
-        .board-name{font-size:0.875rem;font-weight:600;margin-bottom:0.25rem;}
-        .board-count{font-size:0.75rem;color:var(--text-secondary);}
-        .board-item.active .board-count{color:rgba(255,255,255,0.8);}
-        .board-actions{display:flex;gap:0.25rem;}
-        .board-action-btn{background:none;padding:0.25rem;width:28px;height:28px;border:none;border-radius:0.25rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background-color 0.2s;}
-        .board-action-btn:hover{background-color:rgba(255,255,255,0.1);}
-        .main-content{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-        header{border-bottom:1px solid var(--border-color);background-color:rgba(15,15,15,0.95);backdrop-filter:blur(10px);padding:1rem 1.5rem;}
-        .header-content{display:flex;justify-content:space-between;align-items:center;}
-        .header-left h1{font-size:1.5rem;font-weight:bold;margin-bottom:0.25rem;}
-        .header-subtitle{font-size:0.875rem;color:var(--text-secondary);}
-        .feature-flags-btn{padding:0.5rem 1rem;background-color:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:0.5rem;cursor:pointer;font-size:0.875rem;transition:all 0.2s;color:var(--text-primary);}
-        .feature-flags-btn:hover{background-color:var(--bg-secondary);border-color:var(--accent-color);}
-        main{flex:1;overflow-y:auto;padding:2rem 1.5rem;}
-        .stats-bar{display:flex;gap:1rem;margin-bottom:2rem;flex-wrap:wrap;}
-        .stat-card{flex:1;min-width:150px;padding:1rem;background-color:var(--bg-secondary);border:1px solid var(--border-color);border-radius:0.5rem;}
-        .stat-label{font-size:0.75rem;color:var(--text-secondary);text-transform:uppercase;margin-bottom:0.25rem;}
-        .stat-value{font-size:1.5rem;font-weight:bold;}
-        .section-title{font-size:1.125rem;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;}
-        .add-section{margin-bottom:3rem;}
-        .form-container{display:flex;gap:0.5rem;max-width:48rem;flex-wrap:wrap;}
-        input[type="text"], select{flex:1;min-width:200px;padding:0.75rem 1rem;background-color:var(--bg-secondary);border:1px solid var(--border-color);border-radius:0.5rem;color:var(--text-primary);font-size:1rem;transition:all 0.3s ease;}
-        input[type="text"]::placeholder{color:var(--text-secondary);}
-        input[type="text"]:focus,select:focus{outline:none;border-color:var(--accent-color);box-shadow:0 0 0 2px rgba(0,128,255,0.2);}
-        button{display:flex;align-items:center;gap:0.5rem;padding:0.75rem 1.5rem;background-color:var(--button-red);color:white;border:none;border-radius:0.5rem;font-size:1rem;font-weight:500;cursor:pointer;transition:all 0.3s ease;}
-        button:hover:not(:disabled){background-color:var(--button-red-hover);transform:translateY(-2px);box-shadow:0 4px 12px rgba(255,0,0,0.3);}
-        button:disabled{opacity:0.5;cursor:not-allowed;}
-        .filter-bar{display:flex;gap:0.5rem;margin-bottom:1.5rem;align-items:center;flex-wrap:wrap;}
-        .filter-btn{padding:0.5rem 1rem;background-color:var(--bg-secondary);border:1px solid var(--border-color);border-radius:0.5rem;font-size:0.875rem;cursor:pointer;transition:all 0.2s;}
-        .filter-btn.active{background-color:var(--accent-color);border-color:var(--accent-color);}
-        .filter-btn:hover{background-color:var(--bg-tertiary);}
-        .thumbnail-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem;}
-        .thumbnail-card{position:relative;background-color:var(--bg-secondary);border:1px solid var(--border-color);border-radius:0.75rem;overflow:hidden;transition:all 0.2s ease;cursor:pointer;}
-        .thumbnail-card:hover{border-color:var(--accent-color);transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,128,255,0.2);}
-        .thumbnail-image-wrapper{position:relative;width:100%;aspect-ratio:16/9;background-color:var(--bg-tertiary);overflow:hidden;}
-        .thumbnail-image-wrapper img{width:100%;height:100%;object-fit:cover;transition:transform 0.3s ease;}
-        .thumbnail-card:hover .thumbnail-image-wrapper img{transform:scale(1.05);}
-        .thumbnail-actions{position:absolute;top:0.5rem;right:0.5rem;display:flex;gap:0.5rem;opacity:0;transition:opacity 0.2s;}
-        .thumbnail-card:hover .thumbnail-actions{opacity:1;}
-        .action-btn{background-color:rgba(0,0,0,0.7);padding:0.5rem;border-radius:0.375rem;display:flex;align-items:center;justify-content:center;width:36px;height:36px;margin:0;gap:0;backdrop-filter:blur(4px);}
-        .action-btn:hover{background-color:rgba(0,0,0,0.9);transform:scale(1.1);}
-        .action-btn.delete:hover{background-color:var(--button-red);}
-        .thumbnail-info{padding:0.75rem;}
-        .thumbnail-title{font-size:0.875rem;font-weight:600;margin-bottom:0.5rem;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
-        .thumbnail-meta{display:flex;gap:0.75rem;font-size:0.75rem;color:var(--text-secondary);}
-        .category-tag{display:inline-block;padding:0.25rem 0.5rem;background-color:var(--bg-tertiary);border-radius:0.25rem;font-size:0.75rem;}
-        .modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background-color:rgba(0,0,0,0.85);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
-        .modal.active{display:flex;}
-        .modal-content{background-color:var(--bg-secondary);border:1px solid var(--border-color);border-radius:1rem;padding:2rem;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;}
-        .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;}
-        .modal-title{font-size:1.25rem;font-weight:bold;}
-        .close-btn{background:none;padding:0.25rem;width:32px;height:32px;}
-        .feature-flag{display:flex;justify-content:space-between;align-items:center;padding:1rem;background-color:var(--bg-tertiary);border-radius:0.5rem;margin-bottom:0.75rem;}
-        .feature-info h3{font-size:0.9rem;margin-bottom:0.25rem;}
-        .feature-info p{font-size:0.75rem;color:var(--text-secondary);}
-        .toggle-switch{position:relative;width:48px;height:24px;background-color:var(--border-color);border-radius:12px;cursor:pointer;transition:background-color 0.3s;}
-        .toggle-switch.active{background-color:var(--success-color);}
-        .toggle-switch::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;background-color:white;border-radius:50%;transition:transform 0.3s;}
-        .toggle-switch.active::after{transform:translateX(24px);}
-        .modal-input{width:100%;padding:0.75rem;background-color:var(--bg-tertiary);border:1px solid var(--border-color);border-radius:0.5rem;color:var(--text-primary);font-size:1rem;margin-bottom:1rem;}
-        .modal-input:focus{outline:none;border-color:var(--accent-color);}
-        .modal-actions{display:flex;gap:0.5rem;justify-content:flex-end;}
-        .modal-btn{padding:0.5rem 1rem;border-radius:0.5rem;font-size:0.875rem;cursor:pointer;border:none;}
-        .modal-btn.cancel{background-color:var(--bg-tertiary);color:var(--text-primary);}
-        .modal-btn.create{background-color:var(--button-red);color:white;}
-        .empty-state{text-align:center;padding:3rem 1rem;color:var(--text-secondary);font-size:1.125rem;}
-        .icon{width:1.25rem;height:1.25rem;}
-        .small-icon{width:1rem;height:1rem;}
-    </style>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h2>📁 My Boards</h2>
-                <p class="sidebar-subtitle">Organize your thumbnails</p>
-            </div>
-            <div class="sidebar-content">
-                <button class="add-board-btn" onclick="openNewBoardModal()"> 
-                    <span>+</span>
-                    New Board
-                </button>
-                <div class="board-list" id="boardList"></div>
-            </div>
-        </aside>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <header>
-                <div class="header-content">
-                    <div class="header-left">
-                        <h1 id="currentBoardName">Pro Creator Hub</h1>
-                        <p class="header-subtitle">Professional thumbnail management</p>
-                    </div>
+    <!-- Login Overlay -->
+<div id="loginOverlay" class="login-overlay">
+    <div class="login-box">
+
+        <h2 id="authTitle">Login</h2>
+
+        <input id="loginEmail" placeholder="Email">
+        <input id="loginPassword" type="password" placeholder="Password">
+
+        <button onclick="handleAuth()" id="authBtn">Login</button>
+
+        <p class="switch-text">
+            <span id="switchText">Don't have an account?</span>
+            <a href="#" onclick="toggleAuthMode()" id="switchLink">Register</a>
+        </p>
+
+    </div>
+</div>
+
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>📁 My Boards</h2>
+            <p class="sidebar-subtitle">Organize your thumbnails</p>
+        </div>
+        <div class="sidebar-content">
+            <button class="add-board-btn" onclick="openNewBoardModal()"> 
+                <span>+</span>
+                New Board
+            </button>
+            <div class="board-list" id="boardList"></div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header>
+            <div class="header-content">
+                <div class="header-left">
+                    <h1 id="currentBoardName">Pro Creator Hub</h1>
+                    <p class="header-subtitle">Professional thumbnail management</p>
+                </div>
+                <div>
                     <button class="feature-flags-btn" onclick="openFeatureFlags()">
                         ⚙️ Feature Flags
                     </button>
+                    <button onclick="logout()" style="margin-left:10px;">Logout</button>
                 </div>
-            </header>
+            </div>
+        </header>
 
-            <main>
-                <div class="stats-bar" id="statsBar" style="display:none;">
-                    <div class="stat-card">
-                        <div class="stat-label">Total Thumbnails</div>
-                        <div class="stat-value" id="totalCount">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">This Month</div>
-                        <div class="stat-value" id="monthCount">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Favorites</div>
-                        <div class="stat-value" id="favCount">0</div>
-                    </div>
+        <main>
+            <div class="stats-bar" id="statsBar" style="display:none;">
+                <div class="stat-card">
+                    <div class="stat-label">Total Thumbnails</div>
+                    <div class="stat-value" id="totalCount">0</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-label">This Month</div>
+                    <div class="stat-value" id="monthCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Favorites</div>
+                    <div class="stat-value" id="favCount">0</div>
+                </div>
+            </div>
 
-                <section class="add-section">
-                    <h2 class="section-title">Add New Thumbnail</h2>
-                    <form class="form-container" id="linkForm">
-                        <input type="text" id="linkInput" placeholder="Paste YouTube video URL (e.g. https://youtu.be/abc123)" required />
-                        <input type="text" id="titleInput" placeholder="Title" style="display:none;" />
-                        <select id="categorySelect" style="display:none;">
-                            <option value="general">General</option>
-                            <option value="tutorial">Tutorial</option>
-                            <option value="gaming">Gaming</option>
-                            <option value="vlog">Vlog</option>
-                            <option value="music">Music</option>
-                        </select>
-                        <button type="submit" id="addBtn">
-                            <span class="icon">+</span>
-                            Add
-                        </button>
-                    </form>
-                </section>
+            <section class="add-section">
+                <h2 class="section-title">Add New Thumbnail</h2>
+                <form class="form-container" id="linkForm">
+                    <input type="text" id="linkInput" placeholder="Paste YouTube video URL" required />
+                    <input type="text" id="titleInput" placeholder="Title" style="display:none;" />
+                    <select id="categorySelect" style="display:none;">
+                        <option value="general">General</option>
+                        <option value="tutorial">Tutorial</option>
+                        <option value="gaming">Gaming</option>
+                        <option value="vlog">Vlog</option>
+                        <option value="music">Music</option>
+                    </select>
+                    <button type="submit" id="addBtn">Add</button>
+                </form>
+            </section>
 
-                <section>
-                    <h2 class="section-title">Your Thumbnails</h2>
-                    <div class="filter-bar" id="filterBar" style="display:none;">
-                        <button class="filter-btn active" onclick="filterThumbnails('all')">All</button>
-                        <button class="filter-btn" onclick="filterThumbnails('tutorial')">Tutorial</button>
-                        <button class="filter-btn" onclick="filterThumbnails('gaming')">Gaming</button>
-                        <button class="filter-btn" onclick="filterThumbnails('vlog')">Vlog</button>
-                        <button class="filter-btn" onclick="filterThumbnails('music')">Music</button>
-                        <button class="filter-btn" onclick="filterThumbnails('favorites')">⭐ Favorites</button>
-                    </div>
-                    <div class="thumbnail-grid" id="thumbnailGrid"></div>
-                </section>
-            </main>
-        </div>
+            <section>
+    <h2 class="section-title">Your Thumbnails</h2>
+
+    <!-- Filter Bar -->
+    <div id="filterBar" class="filter-bar">
+        <button class="filter-btn active" onclick="filterThumbnails('all', event)">All</button>
+        <button class="filter-btn" onclick="filterThumbnails('general', event)">General</button>
+        <button class="filter-btn" onclick="filterThumbnails('tutorial', event)">Tutorial</button>
+        <button class="filter-btn" onclick="filterThumbnails('gaming', event)">Gaming</button>
+        <button class="filter-btn" onclick="filterThumbnails('vlog', event)">Vlog</button>
+        <button class="filter-btn" onclick="filterThumbnails('music', event)">Music</button>
+        <button class="filter-btn" onclick="filterThumbnails('favorites', event)">⭐ Favorites</button>
     </div>
 
-    <!-- New Board Modal -->
-    <div class="modal" id="newBoardModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Create New Board</h2>
-                <button class="close-btn" onclick="closeNewBoardModal()">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
-            <input type="text" class="modal-input" id="newBoardNameInput" placeholder="Board name (e.g., YouTube 2024, Client Projects)">
-            <div class="modal-actions">
-                <button class="modal-btn cancel" onclick="closeNewBoardModal()">Cancel</button>
-                <button class="modal-btn create" onclick="createNewBoard()">Create Board</button>
-            </div>
-        </div>
+    <div class="thumbnail-grid" id="thumbnailGrid"></div>
+</section>
+        </main>
     </div>
-
-    <!-- Feature Flags Modal -->
-    <div class="modal" id="featureFlagsModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Feature Flags</h2>
-                <button class="close-btn" onclick="closeFeatureFlags()">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
-            <div id="featureFlagsList"></div>
+</div>
+<!-- Feature Flags Modal -->
+<div id="featureFlagsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>⚙ Feature Flags</h2>
+            <button class="close-btn" onclick="closeFeatureFlags()">✕</button>
         </div>
+
+        <div id="featureFlagsList" class="feature-flags-list"></div>
     </div>
-
-    <script>
-    // API base - change if your backend runs elsewhere
-    const API_BASE = "http://127.0.0.1:5000";
-
-    // Feature flags (local UI only)
-    const featureFlags = {
-        analytics: { enabled: false, name: 'Analytics Dashboard', description: 'View stats and insights about your thumbnails' },
-        categories: { enabled: false, name: 'Categories & Tags', description: 'Organize thumbnails by category' },
-        filtering: { enabled: false, name: 'Advanced Filtering', description: 'Filter and sort your thumbnails' },
-        favorites: { enabled: false, name: 'Favorites System', description: 'Star your best thumbnails' },
-        bulkActions: { enabled: false, name: 'Bulk Actions', description: 'Select and manage multiple thumbnails (Coming Soon)' },
-        aiTags: { enabled: false, name: 'AI Auto-Tagging', description: 'Automatically tag thumbnails with AI (Coming Soon)' }
-    };
-
-    // Current state
-    let boards = [];
-    let currentBoardId = null;
-    let currentFilter = 'all';
-    let thumbnailsCache = {}; // boardId -> thumbnails array
-
-    // -------------------------
-    // API helpers
-    // -------------------------
-    async function apiGet(path) {
-        const res = await fetch(API_BASE + path);
-        if (!res.ok) throw new Error(`GET ${path} failed: ${res.status}`);
-        return res.json();
-    }
-
-    async function apiPost(path, body) {
-        const res = await fetch(API_BASE + path, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body)
-        });
-        if (!res.ok) {
-            const text = await res.text();
-            throw new Error(`POST ${path} failed: ${res.status} ${text}`);
-        }
-        return res.json();
-    }
-
-    async function apiDelete(path) {
-        const res = await fetch(API_BASE + path, { method: "DELETE" });
-        if (!res.ok) {
-            const text = await res.text();
-            throw new Error(`DELETE ${path} failed: ${res.status} ${text}`);
-        }
-        return res.json();
-    }
-
-    async function apiPatch(path, body) {
-        const res = await fetch(API_BASE + path, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: body ? JSON.stringify(body) : undefined
-        });
-        if (!res.ok) {
-            const text = await res.text();
-            throw new Error(`PATCH ${path} failed: ${res.status} ${text}`);
-        }
-        return res.json();
-    }
-
-    // -------------------------
-    // Boards
-    // -------------------------
-    async function loadBoards() {
-        try {
-            boards = await apiGet("/boards");
-            if (boards.length > 0) {
-                if (!currentBoardId) currentBoardId = boards[0].id;
-            } else {
-                currentBoardId = null;
-            }
-            renderBoards();
-            if (currentBoardId) {
-                await loadThumbnails(currentBoardId);
-            } else {
-                document.getElementById('thumbnailGrid').innerHTML = '<div class="empty-state">No boards yet. Create one!</div>';
-            }
-        } catch (err) {
-            console.error(err);
-            alert("Failed to load boards: " + err.message);
-        }
-    }
-
-    function renderBoards() {
-        const list = document.getElementById('boardList');
-        list.innerHTML = boards.map(board => `
-            <div class="board-item ${board.id === currentBoardId ? 'active' : ''}" onclick="switchBoard('${board.id}')">
-                <div class="board-info">
-                    <div class="board-name">${escapeHtml(board.name)}</div>
-                    <div class="board-count">${board.thumbnail_count} thumbnails</div>
-                </div>
-                <div class="board-actions">
-                    <button class="board-action-btn" onclick="event.stopPropagation(); deleteBoard('${board.id}')" title="Delete board">
-                        <svg class="small-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        `).join('');
-        // Update header
-        const header = document.getElementById('currentBoardName');
-        const cur = boards.find(b => b.id === currentBoardId);
-        header.textContent = cur ? cur.name : 'Pro Creator Hub';
-    }
-
-    async function createNewBoard() {
-        const name = document.getElementById('newBoardNameInput').value.trim();
-        if (!name) return alert("Please enter a board name");
-        try {
-            const res = await apiPost("/boards", { name });
-            await loadBoards();
-            closeNewBoardModal();
-        } catch (err) {
-            console.error(err);
-            alert("Failed to create board: " + err.message);
-        }
-    }
-
-    async function deleteBoard(boardId) {
-        if (!confirm("Are you sure you want to delete this board? All thumbnails will be lost.")) return;
-        try {
-            await apiDelete(`/boards/${boardId}`);
-            // Clear cache
-            delete thumbnailsCache[boardId];
-            await loadBoards();
-        } catch (err) {
-            console.error(err);
-            alert("Failed to delete board: " + err.message);
-        }
-    }
-
-    function switchBoard(boardId) {
-        currentBoardId = Number(boardId);
-        currentFilter = 'all';
-        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-        const allBtn = Array.from(document.querySelectorAll('.filter-btn')).find(b => b.textContent.trim() === 'All');
-        if (allBtn) allBtn.classList.add('active');
-        renderBoards();
-        loadThumbnails(currentBoardId);
-    }
-
-    // -------------------------
-    // Thumbnails
-    // -------------------------
-    async function loadThumbnails(boardId) {
-        try {
-            const thumbs = await apiGet(`/boards/${boardId}/thumbnails`);
-            thumbnailsCache[boardId] = thumbs;
-            renderThumbnails();
-            if (featureFlags.analytics.enabled) updateStats();
-        } catch (err) {
-            console.error(err);
-            document.getElementById('thumbnailGrid').innerHTML = '<div class="empty-state">Failed to load thumbnails</div>';
-        }
-    }
-
-    function renderThumbnails() {
-        const grid = document.getElementById('thumbnailGrid');
-        const board = boards.find(b => b.id === currentBoardId);
-        const all = thumbnailsCache[currentBoardId] || [];
-
-        let filtered = all;
-        if (currentFilter !== 'all') {
-            if (currentFilter === 'favorites') filtered = all.filter(t => t.favorite);
-            else filtered = all.filter(t => t.category === currentFilter);
-        }
-
-        if (filtered.length === 0) {
-            grid.innerHTML = '<div class="empty-state">No thumbnails found. Add one to get started!</div>';
-            return;
-        }
-
-        grid.innerHTML = filtered.map(thumb => `
-            <div class="thumbnail-card" data-id="${thumb.id}">
-                <div class="thumbnail-image-wrapper">
-                    <img src="${escapeHtml(thumb.thumbnail_url)}" alt="${escapeHtml(thumb.title)}" />
-                    <div class="thumbnail-actions">
-                        ${featureFlags.favorites.enabled ? `<button class="action-btn" onclick="toggleFavorite(${thumb.id});event.stopPropagation();" type="button">${thumb.favorite ? '⭐' : '☆'}</button>` : ''}
-                        <button class="action-btn delete" onclick="removeThumbnail(${thumb.id});event.stopPropagation();" type="button">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="thumbnail-info">
-                    <div class="thumbnail-title">${escapeHtml(thumb.title)}</div>
-                    ${featureFlags.categories.enabled ? `<div class="thumbnail-meta"><span class="category-tag">${escapeHtml(thumb.category)}</span></div>` : ''}
-                </div>
-            </div>
-        `).join('');
-    }
-
-    async function addThumbnailAPI(videoUrl, title, category) {
-        if (!currentBoardId) return alert("Select or create a board first.");
-        try {
-            await apiPost(`/boards/${currentBoardId}/thumbnails`, {
-                video_url: videoUrl,
-                title,
-                category
-            });
-            await loadThumbnails(currentBoardId);
-            if (featureFlags.analytics.enabled) updateStats();
-        } catch (err) {
-            console.error(err);
-            alert("Failed to add thumbnail: " + err.message);
-        }
-    }
-
-    async function removeThumbnail(thumbId) {
-        if (!confirm("Delete this thumbnail?")) return;
-        try {
-            await apiDelete(`/thumbnails/${thumbId}`);
-            // remove from cache
-            const arr = thumbnailsCache[currentBoardId] || [];
-            thumbnailsCache[currentBoardId] = arr.filter(t => t.id !== thumbId);
-            renderThumbnails();
-            if (featureFlags.analytics.enabled) updateStats();
-        } catch (err) {
-            console.error(err);
-            alert("Failed to delete thumbnail: " + err.message);
-        }
-    }
-
-    async function toggleFavorite(thumbId) {
-        try {
-            const res = await apiPatch(`/thumbnails/${thumbId}/favorite`);
-            // update cache
-            const arr = thumbnailsCache[currentBoardId] || [];
-            const t = arr.find(x => x.id === thumbId);
-            if (t) t.favorite = res.favorite;
-            renderThumbnails();
-            if (featureFlags.analytics.enabled) updateStats();
-        } catch (err) {
-            console.error(err);
-            alert("Failed to toggle favorite: " + err.message);
-        }
-    }
-
-    // -------------------------
-    // Filter & Stats
-    // -------------------------
-    function filterThumbnails(filter) {
-        currentFilter = filter;
-        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-        renderThumbnails();
-    }
-
-    function updateStats() {
-        const board = boards.find(b => b.id === currentBoardId);
-        const all = thumbnailsCache[currentBoardId] || [];
-        document.getElementById('totalCount').textContent = all.length;
-        document.getElementById('monthCount').textContent = all.filter(t => new Date(t.created_at).getMonth() === new Date().getMonth()).length;
-        document.getElementById('favCount').textContent = all.filter(t => t.favorite).length;
-    }
-
-    // -------------------------
-    // Feature Flags UI
-    // -------------------------
-    function renderFeatureFlags() {
-        const list = document.getElementById('featureFlagsList');
-        list.innerHTML = Object.entries(featureFlags).map(([key, flag]) => `
-            <div class="feature-flag">
-                <div class="feature-info">
-                    <h3>${flag.name}</h3>
-                    <p>${flag.description}</p>
-                </div>
-                <div class="toggle-switch ${flag.enabled ? 'active' : ''}" onclick="toggleFeature('${key}')"></div>
-            </div>
-        `).join('');
-    }
-
-    function toggleFeature(key) {
-        featureFlags[key].enabled = !featureFlags[key].enabled;
-        renderFeatureFlags();
-        applyFeatureFlags();
-        renderThumbnails();
-    }
-
-    function applyFeatureFlags() {
-        document.getElementById('statsBar').style.display = featureFlags.analytics.enabled ? 'flex' : 'none';
-        document.getElementById('filterBar').style.display = featureFlags.filtering.enabled ? 'flex' : 'none';
-        document.getElementById('titleInput').style.display = featureFlags.categories.enabled ? 'block' : 'none';
-        document.getElementById('categorySelect').style.display = featureFlags.categories.enabled ? 'block' : 'none';
-        if (featureFlags.analytics.enabled) updateStats();
-    }
-
-    // -------------------------
-    // Form handling
-    // -------------------------
-    document.getElementById("linkForm").addEventListener("submit", async function(e){
-        e.preventDefault();
-        const url = document.getElementById("linkInput").value.trim();
-        const title = document.getElementById("titleInput").value.trim() || "New Content";
-        const category = document.getElementById("categorySelect").value || "general";
-        if (!url) return;
-
-        const addBtn = document.getElementById("addBtn");
-        addBtn.disabled = true;
-        try {
-            await addThumbnailAPI(url, title, category);
-            document.getElementById("linkInput").value = "";
-            document.getElementById("titleInput").value = "";
-        } catch (err) {
-            console.error(err);
-            alert("Error adding thumbnail");
-        } finally {
-            addBtn.disabled = false;
-        }
-    });
-
-    // -------------------------
-    // Modals
-    // -------------------------
-    function openNewBoardModal() {
-        document.getElementById('newBoardModal').classList.add('active');
-        document.getElementById('newBoardNameInput').value = '';
-        document.getElementById('newBoardNameInput').focus();
-    }
-    function closeNewBoardModal() {
-        document.getElementById('newBoardModal').classList.remove('active');
-    }
-    function openFeatureFlags() { document.getElementById('featureFlagsModal').classList.add('active'); }
-    function closeFeatureFlags() { document.getElementById('featureFlagsModal').classList.remove('active'); }
-
-    document.getElementById('newBoardNameInput').addEventListener('keypress', function(e){
-        if (e.key === 'Enter') createNewBoard();
-    });
-
-    // -------------------------
-    // Utility
-    // -------------------------
-    function escapeHtml(unsafe) {
-        if (unsafe === null || unsafe === undefined) return '';
-        return String(unsafe)
-            .replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll('"', "&quot;")
-            .replaceAll("'", "&#039;");
-    }
-
-    // -------------------------
-    // Init
-    // -------------------------
-    renderFeatureFlags();
-    applyFeatureFlags();
-    loadBoards();
-    </script>
+</div>
+<!-- JS -->
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
