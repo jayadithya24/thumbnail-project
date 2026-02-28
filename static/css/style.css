@@ -111,12 +111,14 @@
 
 .login-box {
     background: #1a1a1a;
-    padding: 30px;
-    border-radius: 10px;
+    padding: 50px 45px;   /* more internal spacing */
+    border-radius: 16px;
     display: flex;
     flex-direction: column;
-    width: 300px;
-    gap: 12px;
+    width: 420px;         /* bigger width */
+    max-width: 90%;
+    gap: 18px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.6);
 }
 
 .login-box h2 {
@@ -125,11 +127,12 @@
 }
 
 .login-box input {
-    padding: 10px;
-    border-radius: 6px;
+    padding: 14px;
+    border-radius: 8px;
     border: 1px solid #303030;
     background: #272727;
     color: white;
+    font-size: 15px;
 }
 .switch-text {
     text-align: center;
@@ -269,4 +272,9 @@
     background: #ff1e1e;
     color: white;
     border-color: #ff1e1e;
+}
+.login-box button {
+    padding: 14px;
+    font-size: 16px;
+    border-radius: 8px;
 }
